@@ -4,13 +4,14 @@ import TimeGrid from '@fullcalendar/timegrid';
 import DayGrid from '@fullcalendar/daygrid';
 import Interaction from '@fullcalendar/interaction';
 
-const Calendar: React.FC = props => {
+const Calendar: React.FC = () => {
   return (
     <div>
       <FullCalendar
         locale="ja"
+        firstDay={1}
         plugins={[TimeGrid, DayGrid, Interaction]}
-        initialView="timeGridWeek"
+        initialView="dayGridMonth"
         slotDuration="00:30:00"
         selectable={true}
         businessHours={{

@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  carpenter-fe:
+    container_name: carpenter-fe
+    build: ./docker/node
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/app:cached
+    tty: true
+    stdin_open: true
+    # command: sh -c "npm install && yarn start"

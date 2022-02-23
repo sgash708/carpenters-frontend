@@ -10,4 +10,4 @@ services:
       - ./frontend:/app:cached
     tty: true
     stdin_open: true
-    # command: sh -c "npm install && yarn start"
+    command: sh -c script/start.sh

@@ -13,7 +13,7 @@ down:
 exec:
 	docker-compose exec carpenter-fe sh
 logs:
-	docker logs react
+	docker logs carpenter-fe
 test:
 	docker-compose run --rm carpenter-fe sh -c "npm test -- --coverage"
 runbuild:

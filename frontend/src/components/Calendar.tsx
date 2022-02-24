@@ -140,10 +140,8 @@ const Calendar: React.FC = () => {
         type="text"
         value={inputTitle}
         name="inputTitle"
-        onChange={e => {
-          // タイトル入力時、その値をStateに登録
-          setInputTitle(e.target.value)
-        }}
+        // タイトル入力時、その値をStateに登録
+        onChange={e => { setInputTitle(e.target.value) }}
       />
     </div>
   )
@@ -160,9 +158,7 @@ const Calendar: React.FC = () => {
         timeIntervals={10}
         todayButton="today"
         name="inputStart"
-        onChange={(time: Date) => {
-          setInputStart(time)
-        }}
+        onChange={(time: Date) => { setInputStart(time) }}
       />
     </div>
   )

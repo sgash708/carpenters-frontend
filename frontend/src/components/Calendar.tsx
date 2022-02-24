@@ -85,11 +85,6 @@ const Calendar: React.FC = () => {
    * @param selectinfo フォームの現在の状態
    */
   const handleSelect = (selectinfo: any) => {
-    const start = new Date(selectinfo.start)
-    const end = new Date(selectinfo.end)
-    start.setHours(start.getHours())
-    start.setHours(end.getHours())
-
     setInputTitle('')
     setInView(true)
   }

@@ -118,6 +118,10 @@ const Calendar: React.FC = () => {
     setInView(true)
   }
 
+  /**
+   * カレンダーにイベントを追加する
+   * @returns 
+   */
   const onAddEvent = () => {
     const startTime = inputStart
     const endTime = inputEnd
@@ -137,16 +141,15 @@ const Calendar: React.FC = () => {
 
     // TODO: API連携ロジック
     ref.current.getApi().addEvent(event)
+
     setInView(false)
   }
 
   const onAllDayAddEvent = () => {
-    const startTime = inputStart
-
     const event: inputAllDayEventsType = {
       id: inputEvents.length,
       title: inputTitle,
-      start: startTime,
+      start: inputStart,
     }
 
     setAllDayInputEvents([...inputAllDayEvents, event])
@@ -221,7 +224,7 @@ const Calendar: React.FC = () => {
         dateFormat="yyyy/MM/d"
         selected={inputStart}
         todayButton="today"
-        name="inputStart"
+        name="inputDateStart"
         onChange={(time: Date) => { setInputStart(time) }}
       />
     </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
-import { registerLocale } from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import ja from 'date-fns/locale/ja';
 import timeGrid from '@fullcalendar/timegrid';
 import dayGrid from '@fullcalendar/daygrid';
@@ -13,6 +13,13 @@ registerLocale('ja', ja)
 interface inputEventsType {
   id: number
   title: string
+  start: Date
+  end: Date
+}
+interface inputAllDayEventsType {
+  id: number
+  title: string
+  start: Date
 }
 
 const useStyles = makeStyles(() =>
@@ -49,10 +56,17 @@ const useStyles = makeStyles(() =>
     },
   })
 )
-const myEvents: any = [
+let myEvents: any = [
   {
     id: 0,
     title: "event 1",
+    start: "2022-02-22 10:00:00",
+    end: "2020-02-23 11:00:00",
+  },
+  {
+    id: 0,
+    title: "event 1",
+    start: "2022-02-22",
   },
 ];
 
@@ -62,10 +76,14 @@ const Calendar: React.FC = () => {
   const ref = React.createRef<any>()
 
   const [inputTitle, setInputTitle] = useState('')
+  const [inputStart, setInputStart] = useState(new Date)
+  const [inputEnd, setInputEnd] = useState(new Date)
   // イベント登録フォームの表示有無
   const [inView, setInView] = useState(false)
   // 登録イベントの格納
   const [inputEvents, setInputEvents] = useState<inputEventsType[]>([])
+  const [inputAllDayEvents, setAllDayInputEvents] = useState<inputAllDayEventsType[]>([])
+  const [allDay, setAllDay] = useState(true)
 
   /**
    * カレンダークリック時にイベント登録フォームを表示
@@ -75,8 +93,12 @@ const Calendar: React.FC = () => {
     console.log(info)
     const event = inputEvents[info.event.id]
     const title = event.title
+    const start = event.start
+    const end = event.end
 
     setInputTitle(title)
+    setInputStart(start)
+    setInputEnd(end)
     setInView(true)
   }
 
@@ -85,19 +107,54 @@ const Calendar: React.FC = () => {
    * @param selectinfo フォームの現在の状態
    */
   const handleSelect = (selectinfo: any) => {
+    const start = new Date(selectinfo.start)
+    const end = new Date(selectinfo.end)
+    start.setHours(start.getHours())
+    start.setHours(end.getHours())
+
     setInputTitle('')
+    setInputStart(start)
+    setInputEnd(end)
     setInView(true)
   }
 
   const onAddEvent = () => {
+    const startTime = inputStart
+    const endTime = inputEnd
+
+    if (startTime >= endTime) {
+      alert('開始時間と終了時間を確認してください。')
+      return
+    }
     const event: inputEventsType = {
       id: inputEvents.length,
-      title: inputTitle
+      title: inputTitle,
+      start: startTime,
+      end: endTime
     }
 
     setInputEvents([...inputEvents, event])
 
-    ref.current.getApi().onAddEvent(event)
+    // TODO: API連携ロジック
+    ref.current.getApi().addEvent(event)
+    setInView(false)
+  }
+
+  const onAllDayAddEvent = () => {
+    const startTime = inputStart
+
+    const event: inputAllDayEventsType = {
+      id: inputEvents.length,
+      title: inputTitle,
+      start: startTime,
+    }
+
+    setAllDayInputEvents([...inputAllDayEvents, event])
+
+    // TODO: API連携ロジック
+    ref.current.getApi().addEvent(event)
+
+    setInView(false)
   }
 
   const coverElement = (
@@ -120,6 +177,70 @@ const Calendar: React.FC = () => {
     </div>
   )
 
+  const startTimeElement = (
+    <div>
+      <label>開始</label>
+      <DatePicker
+        locale="ja"
+        dateFormat="yyyy/MM/d HH:mm"
+        selected={inputStart}
+        showTimeSelect
+        timeFormat="HH:mm"
+        timeIntervals={10}
+        todayButton="today"
+        name="inputStart"
+        onChange={(time: Date) => { setInputStart(time) }}
+      />
+    </div>
+  )
+
+  const endTimeElement = (
+    <div>
+      <label>終了</label>
+      <DatePicker
+        locale="ja"
+        dateFormat="yyyy/MM/d HH:mm"
+        selected={inputEnd}
+        showTimeSelect
+        timeFormat="HH:mm"
+        timeIntervals={10}
+        todayButton="today"
+        name="inputEnd"
+        onChange={(time: Date) => {
+          setInputEnd(time)
+        }}
+      />
+    </div>
+  )
+
+  const startDateElement = (
+    <div>
+      <label>開始</label>
+      <DatePicker
+        locale="ja"
+        dateFormat="yyyy/MM/d"
+        selected={inputStart}
+        todayButton="today"
+        name="inputStart"
+        onChange={(time: Date) => { setInputStart(time) }}
+      />
+    </div>
+  )
+
+  const endDateElement = (
+    <div>
+      <label>終了</label>
+      <DatePicker
+        locale="ja"
+        dateFormat="yyyy/MM/d"
+        selected={inputEnd}
+        todayButton="today"
+        name="inputDateEnd"
+        onChange={(time: Date) => { setInputEnd(time) }}
+      />
+    </div>
+  )
+
   const btnElement = (
     <div>
       <input
@@ -130,8 +251,29 @@ const Calendar: React.FC = () => {
       <input
         type="button"
         value="保存"
-        onClick={() => onAddEvent()}
+        onClick={() => allDay ? onAllDayAddEvent() : onAddEvent()}
       />
+    </div>
+  )
+  const allDayBtnElement = (
+    <div>
+      <input
+        type="button"
+        value="終日"
+        onClick={() => setAllDay(!allDay)}
+      />
+    </div>
+  )
+  const timeElement = (
+    <div>
+      {startTimeElement}
+      {endTimeElement}
+    </div>
+  )
+  const dateElement = (
+    <div>
+      {startDateElement}
+      {endDateElement}
     </div>
   )
 
@@ -142,6 +284,8 @@ const Calendar: React.FC = () => {
       <form>
         <div>予定を入力</div>
         {titleElement}
+        {allDayBtnElement}
+        {allDay ? dateElement : timeElement}
         {btnElement}
       </form>
     </div>
@@ -172,7 +316,7 @@ const Calendar: React.FC = () => {
         headerToolbar={{
           start: 'title',
           center: 'prev, next, today',
-          end: 'dayGridMonth'
+          end: 'dayGridMonth,timeGridWeek'
         }}
         ref={ref}
         eventClick={handleClick}

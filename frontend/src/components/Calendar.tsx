@@ -9,7 +9,6 @@ import { createStyles, makeStyles } from '@mui/styles';
 
 registerLocale('ja', ja)
 
-// 追加イベントの型
 interface inputEventsType {
   id: number
   title: string
